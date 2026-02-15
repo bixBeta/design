@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QC-CheckeR — System Architecture</title>
+
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+/* ============================= */
+/* THEME VARIABLES */
+/* ============================= */
+
+:root {
+    --bg: #f6f6f6;
+    --card: #ffffff;
+    --border: #dcdcdc;
+    --text: #111111;
+    --muted: #666666;
+    --accent-hover: #ffcc39;
+}
+
+[data-theme="dark"] {
+    --bg: #0e0e0e;
+    --card: #151515;
+    --border: #242424;
+    --text: #d8d8d8;
+    --muted: #777777;
+    --accent-hover: #ffb86b;
+}
+
+/* ============================= */
+
+body{
+    font-family:'IBM Plex Mono', monospace;
+    background:var(--bg);
+    color:var(--text);
+    padding:40px;
+    transition: background .25s ease, color .25s ease;
+}
+
+.container{
+    max-width:1500px;
+    margin:auto;
+}
+
+/* HEADER */
+.header-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:40px;
+}
+
+h1{
+    font-weight:500;
+    font-size:2.2rem;
+    letter-spacing:2px;
+    margin-bottom:6px;
+}
+
+.subtitle{
+    color:var(--muted);
+    font-size:0.85rem;
+}
+
+/* TOGGLE */
+.theme-toggle{
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text);
+    padding:8px 12px;
+    font-family:inherit;
+    font-size:1rem;
+    cursor:pointer;
+    transition:all .2s ease;
+}
+
+.theme-toggle:hover{
+    background:var(--card);
+}
+
+/* GRID */
+.mindmap{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+    gap:24px;
+}
+
+/* CARD */
+.branch{
+    border:1px solid var(--border);
+    background:var(--card);
+    padding:24px;
+    transition:all .2s ease;
+}
+
+/* ORANGE HOVER (except workflow) */
+.branch:not(.workflow):hover{
+    border-color:var(--accent-hover);
+    background:color-mix(in srgb, var(--card) 80%, var(--accent-hover) 20%);
+}
+
+/* CARD HEADER */
+.branch-header{
+    margin-bottom:20px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--border);
+}
+
+.branch-title{
+    font-size:0.9rem;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--muted);
+}
+
+/* NODE */
+.node{ margin-bottom:18px; }
+
+.node-title{
+    font-size:0.9rem;
+    color:var(--text);
+    margin-bottom:6px;
+}
+
+.node-title::before{
+    content:"[+] ";
+    color:var(--muted);
+}
+
+.node-items{
+    list-style:none;
+    padding-left:16px;
+    font-size:0.8rem;
+    color:var(--muted);
+    line-height:1.6;
+}
+
+.node-items li::before{
+    content:"— ";
+    color:var(--border);
+}
+
+/* WORKFLOW */
+.workflow{
+    grid-column:1/-1;
+}
+
+.workflow-steps{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    font-size:0.85rem;
+    color:var(--muted);
+}
+
+.workflow-step{
+    display:flex;
+    gap:8px;
+}
+
+.step-number{
+    font-weight:600; /* 🔥 bold numbers */
+    color:var(--text);
+}
+
+/* FOOTER */
+.footer{
+    margin-top:50px;
+    font-size:0.75rem;
+    color:var(--muted);
+    border-top:1px solid var(--border);
+    padding-top:20px;
+}
+
+@media(max-width:768px){
+    body{ padding:20px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header-row">
+  <div>
+      <h1>QC-CHECKER</h1>
+      <div class="subtitle">RNA-SEQ QUALITY CONTROL / PCA ANALYSIS SHINY MODULES</div>
+  </div>
+
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+      ☾
+  </button>
+</div>
+
+<div class="mindmap">
+
+<!-- WORKFLOW -->
+<div class="branch workflow">
+<div class="branch-header">
+<div class="branch-title">System Workflow</div>
+</div>
+<div class="workflow-steps">
+<div class="workflow-step"><span class="step-number">01</span> Sign Up (Email + PIN)</div>
+<div class="workflow-step"><span class="step-number">02</span> Upload .RData</div>
+<div class="workflow-step"><span class="step-number">03</span> Edit Metadata</div>
+<div class="workflow-step"><span class="step-number">04</span> Annotate Genes</div>
+<div class="workflow-step"><span class="step-number">05</span> Run PCA (DESeq2 VST)</div>
+<div class="workflow-step"><span class="step-number">06</span> Export / DEG-Explorer</div>
+</div>
+</div>
+
+<!-- AUTH -->
+<div class="branch">
+<div class="branch-header"><div class="branch-title">Authentication</div></div>
+<div class="node">
+<div class="node-title">Email Entry</div>
+<ul class="node-items">
+<li>Links sessions across apps</li>
+<li>Used as identifier</li>
+</ul>
+</div>
+<div class="node">
+<div class="node-title">PIN Security</div>
+<ul class="node-items">
+<li>4–6 digit PIN</li>
+<li>Hashed storage</li>
+<li>5 failed attempts = 30m lockout</li>
+</ul>
+</div>
+<div class="node">
+<div class="node-title">Session Limits</div>
+<ul class="node-items">
+<li>Max 5 sessions</li>
+<li>Delete old to create new</li>
+</ul>
+</div>
+</div>
+
+<!-- DATA INPUT -->
+<div class="branch">
+<div class="branch-header"><div class="branch-title">Data Input</div></div>
+<div class="node">
+<div class="node-title">Upload .RData</div>
+<ul class="node-items">
+<li><code>counts</code> gene × sample</li>
+<li><code>metadata</code> sample info</li>
+<li>Required: label, group</li>
+</ul>
+</div>
+<div class="node">
+<div class="node-title">Example Dataset</div>
+<ul class="node-items">
+<li>No signup required</li>
+<li>20 samples / 4 groups</li>
+<li>Learning mode</li>
+</ul>
+</div>
+</div>
+
+<!-- METADATA -->
+<div class="branch">
+<div class="branch-header"><div class="branch-title">Metadata Editor</div></div>
+<div class="node">
+<div class="node-title">View & Sort</div>
+<ul class="node-items">
+<li>Interactive table</li>
+<li>Header sorting</li>
+<li>Pagination</li>
+</ul>
+</div>
+<div class="node">
+<div class="node-title">Edit Samples</div>
+<ul class="node-items">
+<li>Edit modal</li>
+<li>Rename labels</li>
+<li>Add / modify groups</li>
+</ul>
+</div>
+<div class="node">
+<div class="node-title">Delete Samples</div>
+<ul class="node-items">
+<li>Remove unwanted</li>
+<li>Undo supported</li>
+<li>Auto-sync counts</li>
+</ul>
+</div>
+</div>
+
+<!-- ANNOTATION -->
+<div class="branch">
+<div class="branch-header"><div class="branch-title">Gene Annotation</div></div>
+<div class="node">
+<div class="node-title">g:Profiler (Online)</div>
+<ul class="node-items">
+<li>Select organism</li>
+<li>Fetch gene names</li>
+<li>Add descriptions</li>
+<li>Requires internet</li>
+</ul>
+</div>
+<div class="node">
+<div class="node-title">GTF / GFF Upload</div>
+<ul class="node-items">
+<li>Works offline</li>
+<li>Includes coordinates</li>
+<li>Any organism</li>
+</ul>
+</div>
+</div>
+
+<!-- QC -->
+<div class="branch">
+<div class="branch-header"><div class="branch-title">Quality Control</div></div>
+<div class="node">
+<div class="node-title">Raw Counts Violin</div>
+<ul class="node-items">
+<li>Log2(count+1)</li>
+<li>Per-sample distribution</li>
+<li>Colored by group</li>
+<li>Detect outliers</li>
+</ul>
+</div>
+<div class="node">
+<div class="node-title">Interpretation</div>
+<ul class="node-items">
+<li>Similar = good</li>
+<li>Outliers → review</li>
+<li>Low counts = poor quality</li>
+</ul>
+</div>
+</div>
+
+<!-- PCA -->
+<div class="branch">
+<div class="branch-header"><div class="branch-title">PCA Analysis</div></div>
+<div class="node">
+<div class="node-title">VST Normalization</div>
+<ul class="node-items">
+<li>DESeq2 VST</li>
+<li>Blind mode optional</li>
+<li>Parametric / local fit</li>
+</ul>
+</div>
+<div class="node">
+<div class="node-title">PCA Computation</div>
+<ul class="node-items">
+<li>Top variable genes</li>
+<li>Select PC axes</li>
+<li>Interactive Plotly</li>
+</ul>
+</div>
+<div class="node">
+<div class="node-title">Export</div>
+<ul class="node-items">
+<li>PNG / SVG</li>
+<li>PCA CSV</li>
+<li>Top loading genes</li>
+</ul>
+</div>
+</div>
+
+<!-- SESSION -->
+<div class="branch">
+<div class="branch-header"><div class="branch-title">Session Management</div></div>
+<div class="node">
+<div class="node-title">Save System</div>
+<ul class="node-items">
+<li>Manual save</li>
+<li>Status indicators</li>
+<li>Exit warning</li>
+</ul>
+</div>
+<div class="node">
+<div class="node-title">Activity Logging</div>
+<ul class="node-items">
+<li>All actions tracked</li>
+<li>CSV audit trail</li>
+<li>Login attempts logged</li>
+</ul>
+</div>
+<div class="node">
+<div class="node-title">Cross-App Integration</div>
+<ul class="node-items">
+<li>Send to DEG-Explorer</li>
+<li>Shared storage</li>
+<li>Email unifies apps</li>
+</ul>
+</div>
+</div>
+
+</div>
+
+<div class="footer">
+QC-CHECKER v2.1.0c -- SHINY -- developed by <a href="https://github.com/bixBeta" style="color: #808080;">@bixBeta</a>
+</div>
+
+</div>
+
+<script>
+function setToggleIcon(theme){
+    document.getElementById("themeToggle").textContent =
+        theme === "dark" ? "☀" : "☀";
+}
+
+function toggleTheme(){
+    const current = document.documentElement.getAttribute("data-theme");
+    const newTheme = current === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("theme", newTheme);
+    setToggleIcon(newTheme);
+}
+
+/* Load saved or system theme */
+(function(){
+    const saved = localStorage.getItem("theme");
+    const theme = saved
+        ? saved
+        : window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+
+    document.documentElement.setAttribute("data-theme", theme);
+    setToggleIcon(theme);
+})();
+</script>
+
+</body>
+</html>
